@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-from flask import jsonify, Blueprint
+from flask import jsonify
 
 from libs import is_isbn_or_key
 from libs.httper import BookGetter
 
-bp_book = Blueprint(name='book', import_name=__name__)
+from . import bp_web
 
 
-@bp_book.route('/book/search/<q>/<page>')
+@bp_web.route('/book/search/<q>/<page>')
 def search(q: str, page: str):
     """
     搜索图书
