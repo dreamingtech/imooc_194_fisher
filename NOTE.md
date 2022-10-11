@@ -88,6 +88,7 @@ pip install pipenv
 
 pipenv
 
+```
 Usage: pipenv [OPTIONS] COMMAND [ARGS]...
 
 Options:
@@ -159,11 +160,13 @@ Commands:
   update        Runs lock, then sync.
   verify        Verify the hash in Pipfile.lock is up-to-date.
 
+```
 
 如果当前目录没有创建虚拟环境, 会给当前目录创建虚拟环境并绑定
 如果已经创建虚拟环境, 会进入到虚拟环境中
 pipenv shell
 
+```
 D:\projects_study\imooc_194_fisher>pipenv shell
 Launching subshell in virtual environment...
 Microsoft Windows [版本 10.0.19044.1766]
@@ -190,6 +193,8 @@ Locking [dev-packages] dependencies...
 Updated Pipfile.lock (9536c4)!
 Installing dependencies from Pipfile.lock (9536c4)...
 
+```
+
 退出虚拟环境
 exit
 
@@ -199,6 +204,7 @@ pipenv install flask
 查看包依赖
 pipenv graph
 
+```
 Flask==2.2.2
   - click [required: >=8.0, installed: 8.1.3]
     - colorama [required: Any, installed: 0.4.5]
@@ -210,6 +216,7 @@ Flask==2.2.2
   - Werkzeug [required: >=2.2.2, installed: 2.2.2]
     - MarkupSafe [required: >=2.1.1, installed: 2.1.1]
 
+```
 
 (imooc_194_fisher-yaRaPKxN) D:\projects_study\imooc_194_fisher>flask
 Error: Could not locate a Flask application. Use the 'flask --app' option, 'FLASK_APP' environment variable, or a 'wsgi.py' or 'app.py' file in the current directory.
@@ -1045,7 +1052,7 @@ from flask import Flask
 
 app = Flask(__name__)
 
-print('id in application', id(app))
+print(f'id 为 {id(app)} 的 app 实例化')
 
 # app.config.from_pyfile('config.py')
 app.config.from_object('config')
@@ -1055,7 +1062,7 @@ from views import book
 
 
 if __name__ == '__main__':
-    print('id in main', id(app))
+    print(f'id 为 {id(app)} 的 app 运行')
     app.run(host='0.0.0.0', port=5000)
 
 ```
@@ -1071,7 +1078,7 @@ from applications import app
 from libs import is_isbn_or_key
 from libs.httper import BookGetter
 
-print('id in book', id(app))
+print(f'id 为 {id(app)} 的 app 注册路由')
 
 
 @app.route('/book/search/<q>/<page>')
@@ -1164,13 +1171,13 @@ Press CTRL+C to quit
 
 把视图函数注册到蓝图中，再把蓝图注册到核心 app 上，从而实现分层与分业务
 
-__init__.py 把一个目录变成 python 的包, 还兼负着一个包初始化的代码，可以把包的初始化代码写在 __init__.py 文件中
+`__init__.py` 把一个目录变成 python 的包, 还兼负着一个包初始化的代码，可以把包的初始化代码写在 `__init__.py` 文件中
 
 
 新建 applications 模块，把 create_app 的功能从原来的 applications.py 文件中提取出来
 
 
-applications.__init__.py
+`applications.__init__.py`
 
 ```python
 
@@ -1227,7 +1234,7 @@ def search(q: str, page: str):
 
 ```
 
-修改 views.__init__.py
+修改 `views.__init__.py`
 
 
 ```python
@@ -1278,7 +1285,7 @@ BluePrint 不是用来拆分文件的，而是用来在大型项目中拆分业�
 
 新建 views.web 模块，views.api 模块，views.cms 模块
 
-在 views.web.__init__.py 文件中创建 web 蓝图
+在 `views.web.__init__.py` 文件中创建 web 蓝图
 
 
 ```python
@@ -1352,7 +1359,7 @@ def register():
 curl http://127.0.0.1:5000/user/register
 curl http://127.0.0.1:5000/book/search/%E6%88%91%E4%B8%8E%E5%9C%B0%E5%9D%9B/1
 
-修改 views.web.__init__.py 文件
+修改 `views.web.__init__.py` 文件
 
 ```python
 
@@ -1369,9 +1376,9 @@ from views.web import user
 
 但是这里是一个循环导入, book 和 user 中会导入 bp_web，而这里又导入 book 和 user, 因为 book 和 user 只会导入一次，所以代码也不会报错，但从逻辑上来讲还是难以接受的。
 
-可以把 from views.web import book, user 的操作放在 views.__init__.py 文件中
+可以把 from views.web import book, user 的操作放在 `views.__init__.py` 文件中
 
-views.__init__.py
+`views.__init__.py`
 
 ```python
 
@@ -1381,7 +1388,7 @@ from .web import book, user
 
 ```
 
-也可以把 bp_web 的实例化放在其它文件中，而不是 __init__.py 文件中，这样也能避免循环导入
+也可以把 bp_web 的实例化放在其它文件中，而不是 `__init__.py` 文件中，这样也能避免循环导入
 
 
 
@@ -1401,6 +1408,7 @@ if __name__ == '__main__':
 
 ```
 
+```
 fisher/
 ├── applications
 │   └── __init__.py
@@ -1420,8 +1428,9 @@ fisher/
         ├── book.py
         ├── __init__.py
         └── user.py
+```
 
-此时在 manage.py 中 if __name__ == '__main__' 处打上断点，查看 app 中的 url_map 和 view_functions, 可见对应的函数变成了 web.search, 如果是使用蓝图注册的视图函数，就会显示为 `蓝图名.函数名`
+此时在 manage.py 中 `if __name__ == '__main__'` 处打上断点，查看 app 中的 url_map 和 view_functions, 可见对应的函数变成了 web.search, 如果是使用蓝图注册的视图函数，就会显示为 `蓝图名.函数名`
 
 ```
 
@@ -1441,6 +1450,8 @@ from web import book
 
 from web import book 会报错
 
+```
+
 ssh://ubuntu@162.62.134.181:22/home/ubuntu/.pyenv/versions/flask/bin/python -u /data/dev/fisher/manage.py
 Traceback (most recent call last):
   File "/data/dev/fisher/manage.py", line 4, in <module>
@@ -1448,6 +1459,8 @@ Traceback (most recent call last):
   File "/data/dev/fisher/views/__init__.py", line 3, in <module>
     from web import book
 ModuleNotFoundError: No module named 'web'
+
+```
 
 from . web import book
 from .web import book
@@ -1573,3 +1586,55 @@ def search():
 
 ```
 
+使用以下地址访问, 能够正常获取数据
+curl http://127.0.0.1:5000/book/search?q=%E6%88%91%E4%B8%8E%E5%9C%B0%E5%9D%9B
+
+
+不传入 q 参数时, validator.validate() 会无法通过参数校验, 
+curl http://127.0.0.1:5000/book/search?q=
+
+validator.errors 中会保存验证错误的信息
+
+{'q': ['Field must be between 1 and 30 characters long.']}
+
+q = ' ' 时, 请求校验不通过
+'curl http://127.0.0.1:5000/book/search?q= '
+
+但如果再带上 page 参数
+'curl http://127.0.0.1:5000/book/search?q= &page=1'
+
+旧版的 wtforms 会通过校验, 但新版的依旧可以校验到 q 不符合要求
+
+StringField(validators=[DataRequired(), Length(min=1, max=30)])
+从 wtforms 验证器中可以学到构建代码的思想，把独立的功能拆分，写入到不同的对象或函数中，在使用时，通过选择和组合的方法组合不同的功能或规则，而不是把所有功能或规则写在一个函数或对象中
+提倡写一些短小精悍，小而美的的函数，甚至要求函数不要超过 N 行。与此处 wtforms 拆分验证器的思想一致。拆分的越小，使用起来就越灵活，复用性就越高。
+
+
+curl 获取带有 & 的请求时，必须要加上引号
+
+curl "http://127.0.0.1:5000/book/search?page=2&q=%E6%88%91%E4%B8%8E"
+
+curl 不能直接使用非 ascii 字符, 如下 url 不能获取到数据
+curl "http://127.0.0.1:5000/book/search?page=2&q=我"
+
+curl 对非 ascii 字符进行 urlencode 编码
+curl --get --data-urlencode 'q=我' --data-urlencode 'page=2' http://127.0.0.1:5000/book/search
+
+使用 post 请求传入多个相同的参数时，request.args 只接收到1个，request.values 会接收到多个
+
+curl --data-urlencode 'q=天' --data-urlencode 'page=2' "http://127.0.0.1:5000/book/search?page=2&q=%E6%88%91%E4%B8%8E"
+
+request.args
+ImmutableMultiDict([('page', '2'), ('q', '我与')])
+
+request.values
+CombinedMultiDict([ImmutableMultiDict([('page', '2'), ('q', '我与')]), ImmutableMultiDict([('q', '天'), ('page', '2')])])
+
+
+curl -X POST "http://127.0.0.1:5000/book/search?q=%E6%88%91%E4%B8%8E&page=1&q=%E5%A4%A9&page=2"
+
+request.args
+ImmutableMultiDict([('q', '我与'), ('q', '天'), ('page', '1'), ('page', '2')])
+
+request.values
+CombinedMultiDict([ImmutableMultiDict([('q', '我与'), ('q', '天'), ('page', '1'), ('page', '2')]), ImmutableMultiDict([])])
