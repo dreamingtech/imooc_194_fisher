@@ -4,6 +4,7 @@ from flask import jsonify, request
 from libs import is_isbn_or_key
 from libs.httper import BookGetter
 from validators.book import SearchValidator
+from view_models.book import BookViewModel
 
 from . import bp_web
 
@@ -31,8 +32,10 @@ def search():
         isbn_or_key = is_isbn_or_key(keyword=q)
         if isbn_or_key == 'isbn':
             books = BookGetter.search_by_isbn(isbn=q)
+            books = BookViewModel.package_single(data=books, keyword=q)
         else:
             books = BookGetter.search_by_keyword(keyword=q, page=p)
+            books = BookViewModel.package_collection(data=books, keyword=q)
         # 新版的 flask 可以直接返回一个字典, flask 甚至会自动加上 'Content-Type': 'application/json' 的响应头
         # {'Server': 'Werkzeug/2.2.2 Python/3.9.13', 'Date': 'Sun, 09 Oct 2022 08:58:56 GMT',
         # 'Content-Type': 'application/json', 'Content-Length': '997', 'Connection': 'close'}
