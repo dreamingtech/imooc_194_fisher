@@ -27,14 +27,43 @@ class BookGetter(object):
     keyword_url = 'http://t.talelin.com/v2/book/search?q={}&start={}&count={}'
     isbn_url = 'http://t.talelin.com/v2/book/isbn/{}'
 
-    @classmethod
-    def search_by_isbn(cls, isbn: str):
-        url = cls.isbn_url.format(isbn)
-        result = Http.get(url)
-        return result
+    def __init__(self):
+        """
+        把图书搜索的结果保存到类属性中
+        同时把两种不同格式的图书整理成一种格式, 替代 view_models.book.py 中的处理
+        是否把查询的中间参数 如搜索关键词, 页码信息也保存在 Book 的实例属性中, 以方便 views 中使用?
+        从编码的角度来考虑是没问题的, 但从类的内聚性上考虑, 这样会使这个类的职责变得不明确
+        BookGetter 只是对获取图书这个过程的抽象, 隐藏了获取图书的具体过程, 一旦添加了一些中间参数,
+        就会使这个类变得更加具体, 就脱离了 "获取图书" 这一职责, 也就不符合类的封装性和内聚性的特点
+        """
+        self.total = 0
+        self.books = []
 
-    @classmethod
-    def search_by_keyword(cls, keyword: str, page: int = 1):
+    def search_by_isbn(self, isbn: str):
+        url = self.isbn_url.format(isbn)
+        result = Http.get(url)
+        self.__fill_single(result)
+
+    def __fill_single(self, data):
+        """
+        处理 isbn 搜索结果
+        :param data:
+        :return:
+        """
+        if data:
+            self.total = 1
+            self.books.append(data)
+
+    def __fill_collection(self, data):
+        """
+        处理 关键词 搜索结果
+        :param data:
+        :return:
+        """
+        self.total = data['total']
+        self.books = data['books']
+
+    def search_by_keyword(self, keyword: str, page: int = 1):
         """
         talelin api 要求传入 start 和 count 参数, 但之前设计时, 用户需要传入的是 page 参数
         需要进行转换, 这个转换最好是放在本函数内部来进行.
@@ -48,9 +77,9 @@ class BookGetter(object):
         :param keyword:
         :return:
         """
-        url = cls.keyword_url.format(keyword, cls.calculate_start(page), current_app.config.get('PAGE_SIZE', 20))
+        url = self.keyword_url.format(keyword, self.calculate_start(page), current_app.config.get('PAGE_SIZE', 20))
         result = Http.get(url)
-        return result
+        self.__fill_collection(result)
 
     @staticmethod
     def calculate_start(page):

@@ -1,4 +1,32 @@
 # -*- coding: utf-8 -*-
+from libs.httper import BookGetter
+
+
+class BookViewModelSingle:
+    """
+    处理单本的图书数据
+    """
+    def __init__(self, book):
+        self.title = book['title']
+        self.publisher = book['publisher']
+        self.author = '、'.join(book['author'])
+        self.image = book['image']
+        self.price = book['price']
+        self.summary = book['summary']
+        self.isbn = book['isbn']
+        self.pages = book['pages']
+        self.pubdate = book['pubdate']
+        self.binding = book['binding']
+
+
+class BookViewModelCollection:
+    """
+    处理多本的图书数据, 以使用 view 视图函数返回的数据符合模板中字段的要求
+    """
+    def __init__(self, book_getter: BookGetter, keyword):
+        self.total = book_getter.total
+        self.books = [BookViewModelSingle(book) for book in book_getter.books]
+        self.keyword = keyword
 
 
 class BookViewModel:
